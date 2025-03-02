@@ -51,6 +51,44 @@ def add_expness(amount, des, date):
             con.close()
 
 
+def view_expness():
+    cursor.execute("SELECT * FROM expenses")
+    expneses = cursor.fetchall()
+
+    if not expneses:
+        print("📌 No expenses recorded yet.")
+
+    print("\n📝 All Expenses:")
+    print("-" * 50)
+    print(f"{'ID':<5} {'Amount':<10} {'Description':<20} {'Date':<12}")
+    print("-" * 50)
+
+    for exp in expneses:
+        print(f"{exp[0]:<5} {exp[1]:<10} {exp[2]:<20} {exp[3]:<12}")
+
+    print("-" * 50)
+
+
+def update_expness(update_id, new_amm, new_des, new_date):
+    cursor.execute("SELECT * FROM expenses")
+    expneses = cursor.fetchall()
+    if not expneses:
+        print(f"❌ Expense with ID {update_id} not found.")
+        return
+    # update using database where clause
+    cursor.execute(
+        """
+                 UPDATE  expenses
+                 SET amount = ?,description = ?,date = ?
+                 WHERE id = ?
+                  """,
+        (new_amm, new_des, new_date, update_id),
+    )
+
+    con.commit()
+    print(f"✅ Expense ID {update_id} updated successfully!")
+
+
 def main():
     while True:
         print("1.Add Expense")
@@ -68,8 +106,14 @@ def main():
             add_expness(ammont, description, date)
         elif choice == 2:
             print("welcome to view all Expnes Section")
+            view_expness()
         elif choice == 3:
             print("welcome to Edit expness Section")
+            update_id = input("enter id nunber for update")
+            new_amm = input("enter new ammount")
+            new_des = input("enter new description")
+            new_date = input("enter a new date")
+            update_expness(update_id, new_amm, new_des, new_date)
         elif choice == 4:
             print("welcome to Delete Expness Section")
         elif choice == 5:
